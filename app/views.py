@@ -1,4 +1,4 @@
-import urllib, cStringIO
+import urllib, cStringIO, json, random
 import PIL
 import requests
 from flask import render_template, send_file
@@ -45,6 +45,43 @@ def test2():
     out_img = StringIO()
     new_im.save(out_img, 'PNG')
 
+    out_img.seek(0)
+
+    return send_file(out_img, mimetype='image/png')
+
+@app.route('/genimg')
+def genimg():
+    width = 1366
+    height = 768
+    url = 'http://ws.audioscrobbler.com/2.0/?method=user.gettopalbums&user=fakelbst&period=6month&api_key=4dff88a0423651b3570253b10b745b2c&format=json&limit=50&page=1'
+    response = requests.get(url)
+    data =  json.loads(response.text)
+    print data
+
+    albums = data['topalbums']['album']
+
+    img_urls = []
+    for a in albums:
+        img_urls.append(a['image'][2]['#text'])
+
+    new_im = Image.new('RGB', (width, height))
+
+    for i in xrange(0, width, 100):
+        for j in xrange(0, height, 100):
+            print i
+            print j
+
+            img = random.choice(img_urls)
+            r = requests.get(img)
+            img_io = StringIO(r.content)
+
+            image = Image.open(img_io)
+            image.thumbnail((100,100))
+
+            new_im.paste(image, (i, j))
+
+    out_img = StringIO()
+    new_im.save(out_img, 'PNG')
     out_img.seek(0)
 
     return send_file(out_img, mimetype='image/png')
