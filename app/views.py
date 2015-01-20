@@ -11,6 +11,7 @@ from celery.result import AsyncResult
 app.config.update(
     CELERY_BROKER_URL='redis://localhost:6379',
     CELERY_RESULT_BACKEND='redis://localhost:6379'
+    CELERY_TASK_RESULT_EXPIRES = 600
 )
 
 def make_celery(app):
