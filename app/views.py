@@ -6,6 +6,7 @@ from StringIO import StringIO
 from app import app
 from PIL import Image
 from celery import Celery
+from celery.result import AsyncResult
 
 app.config.update(
     CELERY_BROKER_URL='redis://localhost:6379',
@@ -30,34 +31,8 @@ celery = make_celery(app)
 def add_together(a, b):
     return a + b
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/test')
-def test():
-    url = 'http://userserve-ak.last.fm/serve/300x300/96864147.png'
-    response = requests.get(url)
-    img_io = StringIO(response.content)
-    i = Image.open(img_io)
-    img_io.seek(0)
-
-    return send_file(img_io, mimetype='image/png')
-
-@app.route('/genimg')
-def genimg():
-    width = 1366
-    height = 768
-    url = 'http://ws.audioscrobbler.com/2.0/?method=user.gettopalbums&user=fakelbst&api_key=4dff88a0423651b3570253b10b745b2c&format=json&limit=50&page=1'
-    response = requests.get(url)
-    data =  json.loads(response.text)
-    print data
-
-    albums = data['topalbums']['album']
-
-    img_urls = []
-    for a in albums:
-        img_urls.append(a['image'][2]['#text'])
+@celery.task()
+def gen_img(img_urls, width, height):
 
     new_im = Image.new('RGB', (width, height))
 
@@ -77,12 +52,52 @@ def genimg():
     out_img = StringIO()
     new_im.save(out_img, 'PNG')
     out_img.seek(0)
+    return out_img
 
-    return send_file(out_img, mimetype='image/png')
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/test')
+def test():
+    url = 'http://userserve-ak.last.fm/serve/300x300/96864147.png'
+    response = requests.get(url)
+    img_io = StringIO(response.content)
+    i = Image.open(img_io)
+    img_io.seek(0)
+
+    return send_file(img_io, mimetype='image/png')
+
+@app.route('/genimg')
+def genimg():
+    # width = 1366
+    # height = 768
+    width = 366
+    height = 268
+
+    url = 'http://ws.audioscrobbler.com/2.0/?method=user.gettopalbums&user=fakelbst&api_key=4dff88a0423651b3570253b10b745b2c&format=json&limit=50&page=1'
+    response = requests.get(url)
+    data =  json.loads(response.text)
+    print data
+
+    albums = data['topalbums']['album']
+
+    img_urls = []
+    for a in albums:
+        img_urls.append(a['image'][2]['#text'])
+
+    task = gen_img.delay(img_urls, width, height)
+    print task.task_id
+
+    return send_file(task, mimetype='image/png')
 
 @app.route('/test_celery')
 def test_celery():
     result = add_together.delay(23, 42)
-    print(result.get())
-    return jsonify({})
+    return jsonify({'result': result.get()})
+
+@app.route("/task_result/<task_id>")
+def task_result_check(task_id):
+    res = gen_img.AsyncResult(task_id)
+    return jsonify({'ready': res.ready()})
 
