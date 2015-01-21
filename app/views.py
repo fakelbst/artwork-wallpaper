@@ -1,7 +1,7 @@
 import urllib, cStringIO, json, random
 import PIL
 import requests
-from flask import render_template, send_file, jsonify
+from flask import render_template, send_file, jsonify, session
 from StringIO import StringIO
 from app import app
 from PIL import Image
@@ -69,7 +69,7 @@ def test():
 
     return send_file(img_io, mimetype='image/png')
 
-@app.route('/genimg')
+@app.route('/genimg', methods=['POST'])
 def genimg():
     # width = 1366
     # height = 768
@@ -88,9 +88,8 @@ def genimg():
         img_urls.append(a['image'][2]['#text'])
 
     task = gen_img.delay(img_urls, width, height)
-    print task.task_id
 
-    return send_file(task, mimetype='image/png')
+    return jsonify({'task_id': task.task_id, 'success': True})
 
 @app.route('/test_celery')
 def test_celery():
@@ -103,8 +102,13 @@ def task_result_check(task_id):
     print res.ready()
     if res.ready() != False:
         result = res.result
-        return send_file(result, mimetype='image/png')
+        return jsonify({'ready': True})
     else:
         return jsonify({'ready': False})
 
+@app.route('/img/<task_id>')
+def return_imgobk(task_id):
+    res = gen_img.AsyncResult(task_id)
+    result = res.result
+    return send_file(result, mimetype='image/png')
 
