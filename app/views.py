@@ -10,7 +10,7 @@ from celery.result import AsyncResult
 
 app.config.update(
     CELERY_BROKER_URL='redis://localhost:6379',
-    CELERY_RESULT_BACKEND='redis://localhost:6379'
+    CELERY_RESULT_BACKEND='redis://localhost:6379',
     CELERY_TASK_RESULT_EXPIRES = 600
 )
 
@@ -100,5 +100,11 @@ def test_celery():
 @app.route("/task_result/<task_id>")
 def task_result_check(task_id):
     res = gen_img.AsyncResult(task_id)
-    return jsonify({'ready': res.ready()})
+    print res.ready()
+    if res.ready() != False:
+        result = res.result
+        return send_file(result, mimetype='image/png')
+    else:
+        return jsonify({'ready': False})
+
 
