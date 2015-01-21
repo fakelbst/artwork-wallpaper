@@ -27,15 +27,16 @@
 
   $(function(){
     $('#ok').on('click', function(){
+      var width = screen.width,
+          height = screen.height;
       $.ajax({
         type: 'POST',
-        url: '/genimg'
+        url: '/genimg',
+        data: {width: width, height: height}
       }).done(function(data){
         console.log(data);
         if(data.success){
           progressJs().setOptions({overlayMode: true, theme: 'blueOverlay'}).start();//.increase(5);
-          // setInterval(checkFinish(data.task_id), 1000);
-          
           tid = data.task_id;
           setInterval(checkFinish, 3000);
         }
