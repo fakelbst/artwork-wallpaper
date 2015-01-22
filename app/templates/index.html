@@ -8,19 +8,21 @@
 <script src="{{ static('javascripts/libs/progress.min.js') }}"></script>
 
 <script>
-  var tid = '';
+  var tid, interval;
   function checkFinish(){
     $.ajax({
       type: 'GET',
       url: '/task_result/'+tid
     }).done(function(data){
       if(data.ready){
-        clearInterval(checkFinish);
+
         progressJs().setOptions({overlayMode: true, theme: 'blueOverlay'}).end();
-        window.location.href = '/img/'+tid;
+
+        document.getElementById("img").src = '/img/'+tid;
+
+        clearInterval(interval);
       }
       else{
-          // progressJs().setOptions({overlayMode: true, theme: 'blueOverlay'}).increase(5);
           progressJs().setOptions({overlayMode: true, theme: 'blueOverlay'}).set(data.current*100)
       }
     });
@@ -37,13 +39,14 @@
       }).done(function(data){
         console.log(data);
         if(data.success){
-          progressJs().setOptions({overlayMode: true, theme: 'blueOverlay'}).start();//.increase(5);
+          progressJs().setOptions({overlayMode: true, theme: 'blueOverlay'}).start();
           tid = data.task_id;
-          setInterval(checkFinish, 3000);
+          interval = setInterval(checkFinish, 3000);
         }
       });
     });
   });
+
 </script>
 
 {% endblock %}
