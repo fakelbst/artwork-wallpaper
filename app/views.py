@@ -28,10 +28,6 @@ def make_celery(app):
 
 celery = make_celery(app)
 
-@celery.task()
-def add_together(a, b):
-    return a + b
-
 @celery.task(bind=True)
 def gen_img(self, img_urls, width, height):
     new_im = Image.new('RGB', (width, height))
@@ -58,20 +54,10 @@ def gen_img(self, img_urls, width, height):
 def index():
     return render_template('index.html')
 
-@app.route('/test')
-def test():
-    url = 'http://userserve-ak.last.fm/serve/300x300/96864147.png'
-    response = requests.get(url)
-    img_io = StringIO(response.content)
-    i = Image.open(img_io)
-    img_io.seek(0)
-
-    return send_file(img_io, mimetype='image/png')
-
 @app.route('/genimg', methods=['POST'])
 def genimg():
-    # width = 1366
-    # height = 768
+    # width =  request.values.get('width', 0, type=int)
+    # height = request.values.get('height', 0, type=int)
     width = 366
     height = 268
     session['width'] = width
@@ -90,11 +76,6 @@ def genimg():
     task = gen_img.delay(img_urls, width, height)
 
     return jsonify({'task_id': task.task_id, 'success': True})
-
-@app.route('/test_celery')
-def test_celery():
-    result = add_together.delay(23, 42)
-    return jsonify({'result': result.get()})
 
 @app.route("/task_result/<task_id>")
 def task_result_check(task_id):
