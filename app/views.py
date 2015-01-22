@@ -32,11 +32,9 @@ celery = make_celery(app)
 def add_together(a, b):
     return a + b
 
-@celery.task()
-def gen_img(img_urls, width, height):
-
+@celery.task(bind=True)
+def gen_img(self, img_urls, width, height):
     new_im = Image.new('RGB', (width, height))
-
     for i in xrange(0, width, 100):
         for j in xrange(0, height, 100):
             print i
@@ -49,6 +47,7 @@ def gen_img(img_urls, width, height):
             image.thumbnail((100,100))
 
             new_im.paste(image, (i, j))
+        self.update_state(state='PROGRESS', meta={'currenti': i})
 
     out_img = StringIO()
     new_im.save(out_img, 'PNG')
@@ -75,11 +74,12 @@ def genimg():
     # height = 768
     width = 366
     height = 268
+    session['width'] = width
+    session['height'] = height
 
     url = 'http://ws.audioscrobbler.com/2.0/?method=user.gettopalbums&user=fakelbst&api_key=4dff88a0423651b3570253b10b745b2c&format=json&limit=50&page=1'
     response = requests.get(url)
     data =  json.loads(response.text)
-    print data
 
     albums = data['topalbums']['album']
 
@@ -99,12 +99,13 @@ def test_celery():
 @app.route("/task_result/<task_id>")
 def task_result_check(task_id):
     res = gen_img.AsyncResult(task_id)
-    print res.ready()
+    if res.state == 'PROGRESS':
+        widthi = res.info.get('currenti', 0)
+        current = float(widthi)/float(session['width'])
+        return jsonify({'ready': False, 'current': current})
+
     if res.ready() != False:
-        result = res.result
         return jsonify({'ready': True})
-    else:
-        return jsonify({'ready': False})
 
 @app.route('/img/<task_id>')
 def return_imgobk(task_id):
