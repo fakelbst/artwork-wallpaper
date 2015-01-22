@@ -1,7 +1,7 @@
 import urllib, cStringIO, json, random
 import PIL
 import requests
-from flask import render_template, send_file, jsonify, session
+from flask import render_template, send_file, jsonify, session, request
 from StringIO import StringIO
 from app import app
 from PIL import Image
@@ -43,7 +43,7 @@ def gen_img(self, img_urls, width, height):
             image.thumbnail((100,100))
 
             new_im.paste(image, (i, j))
-        self.update_state(state='PROGRESS', meta={'currenti': i})
+            self.update_state(state='PROGRESS', meta={'currentj':j, 'currenti': i})
 
     out_img = StringIO()
     new_im.save(out_img, 'PNG')
@@ -58,8 +58,8 @@ def index():
 def genimg():
     # width =  request.values.get('width', 0, type=int)
     # height = request.values.get('height', 0, type=int)
-    width = 366
-    height = 268
+    width = 566
+    height = 468
     session['width'] = width
     session['height'] = height
 
@@ -81,8 +81,9 @@ def genimg():
 def task_result_check(task_id):
     res = gen_img.AsyncResult(task_id)
     if res.state == 'PROGRESS':
-        widthi = res.info.get('currenti', 0)
-        current = float(widthi)/float(session['width'])
+        width = res.info.get('currenti', 0)
+        height = res.info.get('currentj', 0)
+        current = float(width)/session['width'] + float(height)/session['height']/10
         return jsonify({'ready': False, 'current': current})
 
     if res.ready() != False:
