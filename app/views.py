@@ -31,8 +31,8 @@ celery = make_celery(app)
 @celery.task(bind=True)
 def gen_img(self, img_urls, width, height):
     new_im = Image.new('RGB', (width, height))
-    for i in xrange(0, width, 100):
-        for j in xrange(0, height, 100):
+    for i in xrange(0, width, 200):
+        for j in xrange(0, height, 200):
             print i
             print j
             img = random.choice(img_urls)
@@ -40,7 +40,7 @@ def gen_img(self, img_urls, width, height):
             img_io = StringIO(r.content)
 
             image = Image.open(img_io)
-            image.thumbnail((100,100))
+            image.thumbnail((200, 200))
 
             new_im.paste(image, (i, j))
             self.update_state(state='PROGRESS', meta={'currentj':j, 'currenti': i})
@@ -56,10 +56,10 @@ def index():
 
 @app.route('/genimg', methods=['POST'])
 def genimg():
-    # width =  request.values.get('width', 0, type=int)
-    # height = request.values.get('height', 0, type=int)
-    width = 566
-    height = 468
+    width =  request.values.get('width', 0, type=int)
+    height = request.values.get('height', 0, type=int)
+    # width = 566
+    # height = 468
     session['width'] = width
     session['height'] = height
 
@@ -88,6 +88,9 @@ def task_result_check(task_id):
 
     if res.ready() != False:
         return jsonify({'ready': True})
+
+    else:
+        return jsonify({'ready': False, 'current': 0})
 
 @app.route('/img/<task_id>')
 def return_imgobk(task_id):

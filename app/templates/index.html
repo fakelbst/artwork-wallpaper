@@ -1,53 +1,20 @@
 {% extends 'base.html' %}
 {% block title %}index{% endblock %}
 
-{% block body %}
+{% block stylesheets %}
 <link href="{{ static('javascripts/libs/progressjs.min.css') }}" rel="stylesheet">
-
-<img id="img">
-<input type="button" value="test" id="ok">
-<script src="{{ static('javascripts/libs/progress.min.js') }}"></script>
-
-<script>
-  var tid, interval;
-  function checkFinish(){
-    $.ajax({
-      type: 'GET',
-      url: '/task_result/'+tid
-    }).done(function(data){
-      if(data.ready){
-
-        progressJs().setOptions({overlayMode: true, theme: 'blueOverlay'}).end();
-
-        document.getElementById("img").src = '/img/'+tid;
-
-        clearInterval(interval);
-      }
-      else{
-          progressJs().setOptions({overlayMode: true, theme: 'blueOverlay'}).set(data.current*100)
-      }
-    });
-  }
-
-  $(function(){
-    $('#ok').on('click', function(){
-      var width = screen.width,
-          height = screen.height;
-      $.ajax({
-        type: 'POST',
-        url: '/genimg',
-        data: {width: width, height: height}
-      }).done(function(data){
-        console.log(data);
-        if(data.success){
-          progressJs().setOptions({overlayMode: true, theme: 'blueOverlay'}).start();
-          tid = data.task_id;
-          interval = setInterval(checkFinish, 3000);
-        }
-      });
-    });
-  });
-
-</script>
-
 {% endblock %}
+
+{% block javascripts %}
+<script src="{{ static('javascripts/libs/progress.min.js') }}"></script>
+<script src="{{ static('javascripts/index.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+
+<img id="img" style="display: none;">
+<canvas width="1366" height="768" id="canvas" ></canvas>
+<input type="button" value="test" id="ok">
+<input type="button" value="save" id="save">
+{% endblock %}
+
