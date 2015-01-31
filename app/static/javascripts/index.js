@@ -25,6 +25,7 @@ $(function(){
       });
 
       $('#save').on('click', function(){
+        m.downloadCanvas(this, 'canvas', 'test.png');
       });
     },
     checkFinish: function(){
@@ -44,7 +45,7 @@ $(function(){
 
         }
         else{
-            progressJs().setOptions({overlayMode: true, theme: 'blueOverlay'}).set(data.current*100)
+            if (data.current !== 0) progressJs().setOptions({overlayMode: true, theme: 'blueOverlay'}).set(data.current*100)
         }
       });
     },
@@ -59,7 +60,10 @@ $(function(){
       };
 
       imageObj.src = dataURL;
-
+    },
+    downloadCanvas: function(link, canvasId, filename) {
+      link.href = document.getElementById(canvasId).toDataURL();
+      link.download = filename;
     }
   };
 

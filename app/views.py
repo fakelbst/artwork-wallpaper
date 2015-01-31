@@ -58,12 +58,11 @@ def index():
 def genimg():
     width =  request.values.get('width', 0, type=int)
     height = request.values.get('height', 0, type=int)
-    # width = 566
-    # height = 468
     session['width'] = width
     session['height'] = height
 
-    url = 'http://ws.audioscrobbler.com/2.0/?method=user.gettopalbums&user=fakelbst&api_key=4dff88a0423651b3570253b10b745b2c&format=json&limit=50&page=1'
+    url = 'http://ws.audioscrobbler.com/2.0/?method=user.gettopalbums&user=fakelbst&api_key=4dff88a0423651b3570253b10b745b2c&format=json&limit=100&page=1'
+    # TODO: last.fm server error, set timeout
     response = requests.get(url)
     data =  json.loads(response.text)
 
@@ -71,7 +70,8 @@ def genimg():
 
     img_urls = []
     for a in albums:
-        img_urls.append(a['image'][2]['#text'])
+        if a['image'][3]['#text'] != 'http://cdn.last.fm/flatness/catalogue/noimage/2/default_album_medium.png':
+            img_urls.append(a['image'][3]['#text'])
 
     task = gen_img.delay(img_urls, width, height)
 
