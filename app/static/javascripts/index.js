@@ -15,7 +15,6 @@ $(function(){
           url: '/genimg',
           data: {width: width, height: height}
         }).done(function(data){
-          console.log(data);
           if(data.success){
             progressJs().setOptions({overlayMode: true, theme: 'blueOverlay'}).start();
             m.tid = data.task_id;
@@ -25,7 +24,12 @@ $(function(){
       });
 
       $('#save').on('click', function(){
-        m.downloadCanvas(this, 'canvas', 'test.png');
+        // m.downloadCanvas(this, 'canvas', 'test.png');
+        var canvas = document.getElementById("canvas"), ctx = canvas.getContext("2d");
+        // draw to canvas...
+        canvas.toBlob(function(blob) {
+          saveAs(blob, "pretty image.png");
+        });
       });
     },
     checkFinish: function(){

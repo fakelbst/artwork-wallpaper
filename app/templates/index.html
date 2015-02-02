@@ -7,6 +7,8 @@
 
 {% block javascripts %}
 <script src="{{ static('javascripts/libs/progress.min.js') }}"></script>
+<script src="{{ static('javascripts/libs/canvas-toBlob.js') }}"></script>
+<script src="{{ static('javascripts/libs/FileSaver.min.js') }}"></script>
 <script src="{{ static('javascripts/index.js') }}"></script>
 {% endblock %}
 
@@ -15,6 +17,6 @@
 <img id="img" style="display: none;">
 <canvas width="1366" height="768" id="canvas" ></canvas>
 <input type="button" value="test" id="ok">
-<a id="save">save</a>
+<input type="button" value="save" id="save">
 {% endblock %}
 

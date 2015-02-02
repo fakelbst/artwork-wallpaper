@@ -31,22 +31,23 @@ celery = make_celery(app)
 @celery.task(bind=True)
 def gen_img(self, img_urls, width, height):
     new_im = Image.new('RGB', (width, height))
-    for i in xrange(0, width, 200):
-        for j in xrange(0, height, 200):
+    for i in xrange(0, width, 175):
+        for j in xrange(0, height, 175):
             print i
             print j
             img = random.choice(img_urls)
+            img_urls.remove(img)
             r = requests.get(img)
             img_io = StringIO(r.content)
 
             image = Image.open(img_io)
-            image.thumbnail((200, 200))
+            image.thumbnail((175, 175))
 
             new_im.paste(image, (i, j))
             self.update_state(state='PROGRESS', meta={'currentj':j, 'currenti': i})
 
     out_img = StringIO()
-    new_im.save(out_img, 'PNG')
+    new_im.save(out_img, 'JPEG', quality=90)
     out_img.seek(0)
     return out_img
 
@@ -83,7 +84,7 @@ def task_result_check(task_id):
     if res.state == 'PROGRESS':
         width = res.info.get('currenti', 0)
         height = res.info.get('currentj', 0)
-        current = float(width)/session['width'] + float(height)/session['height']/10
+        current = float(width)/session['width'] + float(height)/session['height'] * 175/session['width']
         return jsonify({'ready': False, 'current': current})
 
     if res.ready() != False:
@@ -96,5 +97,5 @@ def task_result_check(task_id):
 def return_imgobk(task_id):
     res = gen_img.AsyncResult(task_id)
     result = res.result
-    return send_file(result, mimetype='image/png')
+    return send_file(result, mimetype='image/jpg')
 
