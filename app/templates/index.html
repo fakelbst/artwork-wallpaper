@@ -6,6 +6,9 @@
 {% endblock %}
 
 {% block javascripts %}
+<script>
+    $('#canvas').attr('height', screen.height).attr('width', screen.width);
+</script>
 <script src="{{ static('javascripts/libs/progress.min.js') }}"></script>
 <script src="{{ static('javascripts/libs/canvas-toBlob.js') }}"></script>
 <script src="{{ static('javascripts/libs/FileSaver.min.js') }}"></script>
