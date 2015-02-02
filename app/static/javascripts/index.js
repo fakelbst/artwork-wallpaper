@@ -2,6 +2,7 @@ $(function(){
   "use strict";
   var m = {
     init: function(){
+      $('#canvas').css('height', screen.height).css('width', screen.width);
       m.tid = null,
       m.interval = null;
       m.bindEvents();
