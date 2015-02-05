@@ -12,6 +12,7 @@
 <script src="{{ static('javascripts/libs/progress.min.js') }}"></script>
 <script src="{{ static('javascripts/libs/canvas-toBlob.js') }}"></script>
 <script src="{{ static('javascripts/libs/FileSaver.min.js') }}"></script>
+<script src="{{ static('javascripts/libs/interaction,image_filters.min.js') }}"></script>
 <script src="{{ static('javascripts/index.js') }}"></script>
 {% endblock %}
 
@@ -21,5 +22,81 @@
 <canvas id="canvas" ></canvas>
 <input type="button" value="test" id="ok">
 <input type="button" value="save" id="save">
+<div class="controls">
+  <h3>Filters:</h3>
+  <p>
+    <label><span>Grayscale:</span> <input type="checkbox" id="grayscale" ></label>
+  </p>
+  <p>
+    <label><span>Invert:</span> <input type="checkbox" id="invert" ></label>
+  </p>
+  <p>
+    <label><span>Sepia:</span> <input type="checkbox" id="sepia" ></label>
+  </p>
+  <p>
+    <label><span>Sepia2:</span> <input type="checkbox" id="sepia2" ></label>
+  </p>
+  <p>
+    <label><span>Remove white:</span> <input type="checkbox" id="remove-white" ></label>
+    <br>
+    <label>Threshold: <input type="range" id="remove-white-threshold" value="60" min="0" max="255" ></label>
+    <br>
+    <label>Distance: <input type="range" id="remove-white-distance" value="10" min="0" max="255" ></label>
+  </p>
+  <p>
+    <label><span>Brightness:</span> <input type="checkbox" id="brightness" ></label>
+    <br>
+    <label>Value: <input type="range" id="brightness-value" value="100" min="0" max="255" ></label>
+  </p>
+  <p>
+    <label><span>Noise:</span> <input type="checkbox" id="noise" ></label>
+    <br>
+    <label>Value: <input type="range" id="noise-value" value="100" min="0" max="1000" ></label>
+  </p>
+  <p>
+    <label><span>GradientTransparency:</span> <input type="checkbox" id="gradient-transparency" ></label>
+    <br>
+    <label>Value: <input type="range" id="gradient-transparency-value" value="100" min="0" max="255" ></label>
+  </p>
+  <p>
+    <label><span>Pixelate</span> <input type="checkbox" id="pixelate" ></label>
+    <br>
+    <label>Value: <input type="range" id="pixelate-value" value="4" min="2" max="20" ></label>
+  </p>
+  <p>
+    <label><span>Blur:</span> <input type="checkbox" id="blur" ></label>
+  </p>
+  <p>
+    <label><span>Sharpen:</span> <input type="checkbox" id="sharpen" ></label>
+  </p>
+  <p>
+    <label><span>Emboss:</span> <input type="checkbox" id="emboss" ></label>
+  </p>
+  <p>
+    <label><span>Tint:</span> <input type="checkbox" id="tint" ></label><br>
+    <label>Color: <input type="color" id="tint-color" value=""></label><br>
+    <label>Opacity: <input type="range" id="tint-opacity" min="0" max="1" value="1" step="0.1"></label><br>
+  </p>
+  <p>
+    <label><span>Multiply:</span> <input type="checkbox" id="multiply" ></label><br>
+    <label>Color: <input type="color" id="multiply-color" value=""></label><br>
+  </p>
+  <p>
+  <label><span>Blend:</span> <input type="checkbox" id="blend" ></label>
+  <br>
+  <label>Mode:</label>
+    <select id="blend-mode" name="blend-mode">
+      <option selected value="add">Add</option>
+      <option value="diff">Diff</option>
+      <option value="subtract">Subtract</option>
+      <option value="multiply">Multiply</option>
+      <option value="screen">Screen</option>
+      <option value="lighten">Lighten</option>
+      <option value="darken">Darken</option>
+    </select>
+    <br>
+    <label>Color: <input type="color" id="blend-color" value="#00f900"></label><br>
+  </p>
+</div>
 {% endblock %}
 

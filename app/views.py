@@ -61,6 +61,7 @@ def genimg():
     height = request.values.get('height', 0, type=int)
 
     length = int(max(width,height) * 0.128) + 1
+    length = min(length, 300) #max size 300*300
 
     session['length'] = length
     session['width'] = width
@@ -89,7 +90,7 @@ def task_result_check(task_id):
         width = res.info.get('currenti', 0)
         height = res.info.get('currentj', 0)
         current = float(width)/session['width'] + float(height)/session['height'] * session['length']/session['width']
-        return jsonify({'ready': False, 'current': current})
+        return jsonify({'ready': False, 'current': '%.4f' % current})
 
     if res.ready() != False:
         return jsonify({'ready': True})
