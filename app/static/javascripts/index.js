@@ -5,26 +5,6 @@ $(function(){
       m.tid = null,
       m.interval = null;
       m.bindEvents();
-
-      fabric.Object.prototype.transparentCorners = false;
-
-      fabric.Object.prototype.padding = 5;
-      fabric.Object.prototype.transparentCorners = false;
-
-      m.canvas = new fabric.Canvas('canvas'),
-      m.f = fabric.Image.filters;
-    },
-    applyFilter: function(index, filter){
-      var obj = m.canvas.getActiveObject();
-      obj.filters[index] = filter;
-      obj.applyFilters(m.canvas.renderAll.bind(canvas));
-    },
-    applyFilterValue: function(index, prop, value) {
-      var obj = m.canvas.getActiveObject();
-      if (obj.filters[index]) {
-        obj.filters[index][prop] = value;
-        obj.applyFilters(m.canvas.renderAll.bind(canvas));
-      }
     },
     bindEvents: function(){
       $('#ok').on('click', function(){
@@ -51,20 +31,6 @@ $(function(){
           saveAs(blob, "wallpaper.jpg");
         });
       });
-
-      $('#noise').on('click', function () {
-        console.log(this.checked);
-
-        m.applyFilter(6, this.checked && new m.f.Noise({
-          noise: parseInt($('#noise-value').val(), 10)
-        }));
-      });
-      $('#noise-value').on('change', function() {
-        console.log(333);
-        console.log(this.value);
-        m.applyFilterValue(6, 'noise', parseInt(this.value, 10));
-      });
-
     },
     checkFinish: function(){
       $.ajax({
@@ -81,9 +47,9 @@ $(function(){
 
           // m.loadCanvas('/img/' + m.tid);
           fabric.Image.fromURL('/img/' + m.tid, function(img) {
-            var oImg = img.set({ left: 50, top: 100, angle: -15 }).scale(0.9);
-            m.canvas.add(oImg).renderAll();
-            m.canvas.setActiveObject(oImg);
+            var oImg = img.set({ left: 20, top: 10})
+            window.canvas.add(oImg).renderAll();
+            window.canvas.setActiveObject(oImg);
           });
 
         }
